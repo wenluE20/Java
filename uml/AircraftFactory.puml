@@ -1,0 +1,102 @@
+@startuml 飞机大战敌机工厂模式
+
+'https://plantuml.com/class-diagram
+
+package 飞机大战游戏 {    
+    ' 产品接口 - 敌机
+    interface EnemyAircraft {
+        + forward(): void
+        + shoot(): List<BaseBullet>
+        + decreaseHp(int): void
+        + isDestroyed(): boolean
+    }
+    
+    ' 具体产品 - 普通敌机
+    class MobEnemyAircraft implements EnemyAircraft {
+        - shootNum: int
+        - power: int
+        - direction: int
+        + shoot(): List<BaseBullet>
+        + forward(): void
+    }
+    
+    ' 具体产品 - 精英敌机
+    class EliteEnemyAircraft implements EnemyAircraft {
+        - shootNum: int
+        - power: int
+        - direction: int
+        + shoot(): List<BaseBullet>
+        + forward(): void
+    }
+    
+    ' 创建者接口 - 敌机工厂
+    interface EnemyFactory {
+        + createEnemyAircraft(): EnemyAircraft
+    }
+    
+    ' 具体创建者 - 普通敌机工厂
+    class MobEnemyFactory implements EnemyFactory {
+        + createEnemyAircraft(): EnemyAircraft
+    }
+    
+    ' 具体创建者 - 精英敌机工厂
+    class EliteEnemyFactory implements EnemyFactory {
+        + createEnemyAircraft(): EnemyAircraft
+    }
+    
+    ' 客户端类
+    class Game {
+        - heroAircraft: HeroAircraft
+        - enemyAircrafts: List<AbstractAircraft>
+        + createEnemy(): void
+    }
+    
+    ' 英雄机（单例）
+    class HeroAircraft {
+        - instance: HeroAircraft
+        + {static} getInstance(): HeroAircraft
+        + getHp(): int
+        + setHp(int): void
+        + decreaseHp(int): void
+        + isDestroyed(): boolean
+    }
+    
+    ' 关系
+    MobEnemyFactory --> MobEnemyAircraft: 创建
+    EliteEnemyFactory --> EliteEnemyAircraft: 创建
+    
+    Game --> EnemyFactory: 使用
+    Game --> HeroAircraft: 使用
+    
+    ' 工厂方法实现说明
+    note right of MobEnemyFactory
+        @Override
+        public EnemyAircraft createEnemyAircraft() {
+            return new MobEnemyAircraft(
+                random.nextInt(Game.WINDOW_WIDTH), 
+                0, 0, 10, 30
+            );
+        }
+    end note
+    
+    note right of EliteEnemyFactory
+        @Override
+        public EnemyAircraft createEnemyAircraft() {
+            return new EliteEnemyAircraft(
+                random.nextInt(Game.WINDOW_WIDTH), 
+                0, 0, 8, 60
+            );
+        }
+    end note
+    
+    note bottom
+        敌机工厂模式说明：
+        1. EnemyAircraft接口定义了所有敌机的共同行为
+        2. MobEnemyAircraft和EliteEnemyAircraft实现具体敌机逻辑
+        3. EnemyFactory接口定义了创建敌机的抽象方法
+        4. MobEnemyFactory和EliteEnemyFactory实现创建具体敌机的方法
+        5. Game类通过工厂接口创建敌机，实现解耦
+    end note
+}
+
+@enduml

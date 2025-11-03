@@ -1,0 +1,131 @@
+@startuml 飞机大战游戏排行榜 - 数据访问对象模式
+
+skinparam class {
+  BackgroundColor PaleGreen
+  ArrowColor SeaGreen
+  BorderColor SpringGreen
+}
+
+skinparam interface {
+  BackgroundColor SkyBlue
+  ArrowColor RoyalBlue
+  BorderColor SteelBlue
+}
+
+skinparam note {
+  BackgroundColor LightYellow
+  FontColor DarkSlateGray
+  BorderColor Gold
+}
+
+/' ========== 数据传输对象（DTO）========== '/
+class GameRecord {
+  -String playerName
+  -int score
+  -Date recordTime
+  -String difficulty
+  
+  +GameRecord()
+  +GameRecord(String playerName, int score, Date recordTime, String difficulty)
+  +String getPlayerName()
+  +void setPlayerName(String playerName)
+  +int getScore()
+  +void setScore(int score)
+  +Date getRecordTime()
+  +void setRecordTime(Date recordTime)
+  +String getDifficulty()
+  +void setDifficulty(String difficulty)
+}
+
+/' ========== DAO接口 ========== '/
+interface GameRecordDAO {
+  +void saveRecord(GameRecord record)
+  +List<GameRecord> getTopRecords(String difficulty, int limit)
+  +List<GameRecord> getAllRecords(String difficulty)
+  +GameRecord getRecordById(int id)
+  +void updateRecord(GameRecord record)
+  +void deleteRecord(int id)
+}
+
+/' ========== 具体DAO实现 ========== '/
+class GameRecordDAOImpl implements GameRecordDAO {
+  -DataSource dataSource
+  
+  +GameRecordDAOImpl(DataSource dataSource)
+  +void saveRecord(GameRecord record)
+  +List<GameRecord> getTopRecords(String difficulty, int limit)
+  +List<GameRecord> getAllRecords(String difficulty)
+  +GameRecord getRecordById(int id)
+  +void updateRecord(GameRecord record)
+  +void deleteRecord(int id)
+}
+
+/' ========== 数据源 ========== '/
+class FileDataSource implements DataSource {
+  -String filePath
+  
+  +FileDataSource(String filePath)
+  +Connection getConnection()
+  +void close()
+}
+
+interface DataSource {
+  +Connection getConnection()
+  +void close()
+}
+
+/' ========== 业务层 ========== '/
+class GameService {
+  -GameRecordDAO gameRecordDAO
+  
+  +GameService(GameRecordDAO gameRecordDAO)
+  +void saveGameRecord(String playerName, int score, String difficulty)
+  +List<GameRecord> getTopRanking(String difficulty, int limit)
+  +boolean isTopScore(int score, String difficulty)
+}
+
+/' ========== 客户端使用 ========== '/
+class GameController {
+  -GameService gameService
+  -int currentScore
+  -String currentDifficulty
+  
+  +void addScore(int points)
+  +void showRanking()
+  +void saveGameRecordIfTop(String playerName)
+}
+
+/' ========== 关系定义 ========== '/
+GameRecordDAOImpl --> GameRecord : uses
+GameRecordDAOImpl --> DataSource : depends on
+FileDataSource ..|> DataSource : implements
+GameService --> GameRecordDAO : uses
+GameController --> GameService : uses
+
+/' ========== 图例和说明 ========== '/
+note right of GameRecord
+  数据传输对象（DTO）
+  封装游戏记录的数据结构
+end note
+
+note right of GameRecordDAO
+  DAO接口
+  定义数据访问的标准方法
+end note
+
+note right of GameRecordDAOImpl
+  具体DAO实现
+  实现与数据源交互的逻辑
+end note
+
+note right of DataSource
+  数据源接口
+  抽象数据存储的访问方式
+end note
+
+note right of GameService
+  业务逻辑层
+  处理游戏记录相关的业务逻辑
+end note
+
+@enduml

@@ -1,0 +1,125 @@
+@startuml 游戏难度模板模式
+
+skinparam backgroundColor white
+skinparam handwritten false
+skinparam class {
+    BackgroundColor LightYellow
+    ArrowColor Gray
+    BorderColor Gray
+    ArrowThickness 0.5
+}
+
+' 定义抽象类：游戏难度模板
+abstract class AbstractDifficultyTemplate {
+    - String difficultyName
+    - int enemyMaxNumber
+    - int cycleDuration
+    - int bossScoreThreshold
+    - int elitePlusGenerateInterval
+    - int heroHp
+    - int heroPower
+    - String backgroundImagePath
+    
+    + configureGame()
+    + getDifficultyName()
+    + getEnemyMaxNumber()
+    + getCycleDuration()
+    + getBossScoreThreshold()
+    + getElitePlusGenerateInterval()
+    + getHeroHp()
+    + getHeroPower()
+    + getBackgroundImagePath()
+    
+    ' 模板方法，定义算法框架
+    + applyDifficultySettings()
+    
+    ' 抽象方法，子类必须实现
+    # abstract configureEnemySettings()
+    # abstract configureBossSettings()
+    # abstract configureHeroSettings()
+    # abstract configureBackground()
+    
+    ' 钩子方法，子类可以选择覆盖
+    # updateDifficultyByTime(int time) {}
+    # updateDifficultyByScore(int score) {}
+}
+
+' 定义具体类：简单难度
+class EasyDifficulty extends AbstractDifficultyTemplate {
+    + EasyDifficulty()
+    # configureEnemySettings()
+    # configureBossSettings()
+    # configureHeroSettings()
+    # configureBackground()
+}
+
+' 定义具体类：普通难度
+class NormalDifficulty extends AbstractDifficultyTemplate {
+    + NormalDifficulty()
+    # configureEnemySettings()
+    # configureBossSettings()
+    # configureHeroSettings()
+    # configureBackground()
+    # updateDifficultyByTime(int time)
+    # updateDifficultyByScore(int score)
+}
+
+' 定义具体类：困难难度
+class HardDifficulty extends AbstractDifficultyTemplate {
+    + HardDifficulty()
+    # configureEnemySettings()
+    # configureBossSettings()
+    # configureHeroSettings()
+    # configureBackground()
+    # updateDifficultyByTime(int time)
+    # updateDifficultyByScore(int score)
+}
+
+' 定义游戏类，使用难度模板
+class Game {
+    - AbstractDifficultyTemplate difficultyTemplate
+    - int score
+    - int time
+    
+    + Game(String difficulty)
+    + startGame()
+    + updateGameState()
+    + checkBossGeneration()
+}
+
+' 关系：Game 使用 AbstractDifficultyTemplate
+Game --> AbstractDifficultyTemplate : 使用
+
+' 关系：模板方法调用
+AbstractDifficultyTemplate ..> AbstractDifficultyTemplate : applyDifficultySettings()调用
+
+note right of AbstractDifficultyTemplate
+  模板方法模式: 在超类中定义算法框架，
+  允许子类在不修改结构的情况下重写
+  算法的特定步骤
+end note
+
+note bottom of EasyDifficulty
+  简单难度:
+  - 敌机数量少
+  - 敌机生成慢
+  - Boss出现阈值高
+  - 英雄机血量多
+end note
+
+note bottom of NormalDifficulty
+  普通难度:
+  - 中等敌机数量
+  - 中等敌机生成速度
+  - 随时间和分数增加难度
+end note
+
+note bottom of HardDifficulty
+  困难难度:
+  - 敌机数量多
+  - 敌机生成快
+  - Boss出现阈值低
+  - 快速增加难度
+end note
+
+@enduml

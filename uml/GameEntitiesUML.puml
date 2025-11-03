@@ -1,0 +1,117 @@
+@startuml
+
+' 设置图的标题和样式
+title 游戏实体类图
+skinparam defaultFontName "Microsoft YaHei"
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' 定义抽象类和具体类
+abstract class AbstractFlyingObject {
+    - locationX: int
+    - locationY: int
+    - speedX: int
+    - speedY: int
+    - valid: boolean
+    + forward(): void
+    + getLocationX(): int
+    + getLocationY(): int
+    + setLocationX(int): void
+    + setLocationY(int): void
+    + crash(AbstractFlyingObject): boolean
+    + notValid(): boolean
+    + vanish(): void
+}
+
+abstract class AbstractAircraft extends AbstractFlyingObject {
+    - hp: int
+    - power: int
+    - shootNum: int
+    + decreaseHp(int): void
+    + increaseHp(int): void
+    + getHp(): int
+    + setHp(int): void
+    + getMaxHp(): int
+    + shoot(): List<BaseBullet>
+}
+
+class HeroAircraft extends AbstractAircraft {
+    + HeroAircraft(int, int, int, int, int)
+    + forward(): void
+    + shoot(): List<BaseBullet>
+}
+
+class MobEnemy extends AbstractAircraft {
+    + MobEnemy(int, int, int, int, int)
+    + forward(): void
+    + shoot(): List<BaseBullet>
+}
+
+class EliteEnemy extends AbstractAircraft {
+    + EliteEnemy(int, int, int, int, int)
+    + forward(): void
+    + shoot(): List<BaseBullet>
+}
+
+abstract class BaseBullet extends AbstractFlyingObject {
+    - power: int
+    + getPower(): int
+    + forward(): void
+}
+
+class HeroBullet extends BaseBullet {
+    + HeroBullet(int, int, int, int, int)
+    + forward(): void
+}
+
+class EnemyBullet extends BaseBullet {
+    + EnemyBullet(int, int, int, int, int)
+    + forward(): void
+}
+
+abstract class AbstractProp extends AbstractFlyingObject {
+    + AbstractProp(int, int, int, int)
+    + forward(): void
+    + abstract active(): void
+}
+
+class BloodProp extends AbstractProp {
+    - heroAircraft: HeroAircraft
+    + BloodProp(int, int, int, int, HeroAircraft)
+    + active(): void
+}
+
+class FireProp extends AbstractProp {
+    + FireProp(int, int, int, int)
+    + active(): void
+}
+
+class BombProp extends AbstractProp {
+    + BombProp(int, int, int, int)
+    + active(): void
+}
+
+class Game {
+    - heroAircraft: HeroAircraft
+    - enemyAircrafts: List<AbstractAircraft>
+    - heroBullets: List<BaseBullet>
+    - enemyBullets: List<BaseBullet>
+    - props: List<AbstractProp>
+    - random: Random
+    + enemyGenerateAction(): void
+    + shootAction(): void
+    + aircraftsMoveAction(): void
+    + propsMoveAction(): void
+    + crashCheckAction(): void
+    + generateProp(int, int): void
+}
+
+' 定义关系
+Game --> HeroAircraft
+Game --> AbstractAircraft
+Game --> BaseBullet
+Game --> AbstractProp
+
+BloodProp --> HeroAircraft
+
+@enduml

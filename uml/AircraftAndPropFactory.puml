@@ -1,0 +1,160 @@
+@startuml 飞机大战工厂模式
+'https://plantuml.com/class-diagram
+
+package 飞机大战游戏 {
+    ' 产品接口 - 敌机
+    interface EnemyAircraft {
+        + forward(): void
+        + shoot(): List<BaseBullet>
+        + decreaseHp(int): void
+        + isDestroyed(): boolean
+    }
+    
+    ' 具体产品 - 普通敌机
+    class MobEnemyAircraft implements EnemyAircraft {
+        - shootNum: int
+        - power: int
+        - direction: int
+        + shoot(): List<BaseBullet>
+        + forward(): void
+    }
+    
+    ' 具体产品 - 精英敌机
+    class EliteEnemyAircraft implements EnemyAircraft {
+        - shootNum: int
+        - power: int
+        - direction: int
+        + shoot(): List<BaseBullet>
+        + forward(): void
+    }
+    
+    ' 创建者接口 - 敌机工厂
+    interface EnemyFactory {
+        + createEnemyAircraft(): EnemyAircraft
+    }
+    
+    ' 具体创建者 - 普通敌机工厂
+    class MobEnemyFactory implements EnemyFactory {
+        + createEnemyAircraft(): EnemyAircraft
+    }
+    
+    ' 具体创建者 - 精英敌机工厂
+    class EliteEnemyFactory implements EnemyFactory {
+        + createEnemyAircraft(): EnemyAircraft
+    }
+    
+    ' 产品接口 - 道具
+    interface Prop {
+        + forward(): void
+        + takeEffect(HeroAircraft): void
+        + getLocationX(): int
+        + getLocationY(): int
+    }
+    
+    ' 具体产品 - 火力道具
+    class FireProp implements Prop {
+        + takeEffect(HeroAircraft): void
+        + forward(): void
+    }
+    
+    ' 具体产品 - 炸弹道具
+    class BombProp implements Prop {
+        + takeEffect(HeroAircraft): void
+        + forward(): void
+    }
+    
+    ' 具体产品 - 加血道具
+    class BloodProp implements Prop {
+        + takeEffect(HeroAircraft): void
+        + forward(): void
+    }
+    
+    ' 创建者接口 - 道具工厂
+    interface PropFactory {
+        + createProp(int, int): Prop
+    }
+    
+    ' 具体创建者 - 火力道具工厂
+    class FirePropFactory implements PropFactory {
+        + createProp(int, int): Prop
+    }
+    
+    ' 具体创建者 - 炸弹道具工厂
+    class BombPropFactory implements PropFactory {
+        + createProp(int, int): Prop
+    }
+    
+    ' 具体创建者 - 加血道具工厂
+    class BloodPropFactory implements PropFactory {
+        + createProp(int, int): Prop
+    }
+    
+    ' 客户端类
+    class Game {
+        - heroAircraft: HeroAircraft
+        - enemyAircrafts: List<AbstractAircraft>
+        - props: List<AbstractProp>
+        + createEnemy(): void
+        + dropProp(int, int): void
+    }
+    
+    ' 英雄机（单例）
+    class HeroAircraft {
+        - instance: HeroAircraft
+        + {static} getInstance(): HeroAircraft
+        + getHp(): int
+        + setHp(int): void
+        + decreaseHp(int): void
+        + isDestroyed(): boolean
+    }
+    
+    ' 关系
+    MobEnemyFactory --> MobEnemyAircraft: 创建
+    EliteEnemyFactory --> EliteEnemyAircraft: 创建
+    FirePropFactory --> FireProp: 创建
+    BombPropFactory --> BombProp: 创建
+    BloodPropFactory --> BloodProp: 创建
+    
+    Game --> EnemyFactory: 使用
+    Game --> PropFactory: 使用
+    Game --> HeroAircraft: 使用
+    
+    ' 工厂方法实现说明
+    note right of MobEnemyFactory
+        @Override
+        public EnemyAircraft createEnemyAircraft() {
+            return new MobEnemyAircraft(
+                random.nextInt(Game.WINDOW_WIDTH), 
+                0, 0, 10, 30
+            );
+        }
+    end note
+    
+    note right of EliteEnemyFactory
+        @Override
+        public EnemyAircraft createEnemyAircraft() {
+            return new EliteEnemyAircraft(
+                random.nextInt(Game.WINDOW_WIDTH), 
+                0, 0, 8, 60
+            );
+        }
+    end note
+    
+    note right of FirePropFactory
+        @Override
+        public Prop createProp(int x, int y) {
+            return new FireProp(x, y, 0, 15);
+        }
+    end note
+    
+    note bottom
+        工厂模式说明：
+        1. 产品接口定义了所有具体产品的共同行为
+        2. 具体产品实现产品接口的具体逻辑
+        3. 创建者接口定义了创建产品的抽象方法
+        4. 具体创建者实现创建具体产品的方法
+        5. 客户端通过工厂接口创建产品，而不直接实例化具体产品类
+    end note
+}
+
+@enduml

@@ -1,0 +1,107 @@
+@startuml 子弹发射策略模式
+
+' 设置图的方向为水平
+left to right direction
+
+' 声明策略接口
+interface BulletStrategy {
+    + List<BaseBullet> execute(Aircraft aircraft)
+}
+
+' 具体策略类 - 直射
+class DirectShootStrategy implements BulletStrategy {
+    + List<BaseBullet> execute(Aircraft aircraft)
+}
+
+' 具体策略类 - 散射
+class ScatterShootStrategy implements BulletStrategy {
+    + List<BaseBullet> execute(Aircraft aircraft)
+}
+
+' 具体策略类 - 环射
+class RingShootStrategy implements BulletStrategy {
+    + List<BaseBullet> execute(Aircraft aircraft)
+}
+
+' 上下文类 - 子弹发射上下文
+class BulletContext {
+    - BulletStrategy strategy
+    - int bulletPower
+    - int bulletNum
+    - int bulletDirection
+    
+    + BulletContext(BulletStrategy strategy)
+    + setStrategy(BulletStrategy strategy)
+    + setBulletPower(int power)
+    + setBulletNum(int num)
+    + setBulletDirection(int direction)
+    + List<BaseBullet> shoot(Aircraft aircraft)
+}
+
+' 飞机类（作为客户端使用策略）
+abstract class AbstractAircraft {
+    - BulletContext bulletContext
+    
+    + setBulletStrategy(BulletStrategy strategy)
+    + abstract List<BaseBullet> shoot()
+}
+
+class HeroAircraft extends AbstractAircraft {
+    + List<BaseBullet> shoot()
+}
+
+class EliteEnemy extends AbstractAircraft {
+    + List<BaseBullet> shoot()
+}
+
+class ElitePlusEnemy extends AbstractAircraft {
+    + List<BaseBullet> shoot()
+}
+
+class BossEnemy extends AbstractAircraft {
+    + List<BaseBullet> shoot()
+}
+
+' 子弹类
+abstract class BaseBullet {
+    - int power
+    - int speedX
+    - int speedY
+}
+
+' 关联关系
+AbstractAircraft ..> BulletContext : has
+BulletContext ..> BulletStrategy : uses
+BulletStrategy <|-- DirectShootStrategy
+BulletStrategy <|-- ScatterShootStrategy
+BulletStrategy <|-- RingShootStrategy
+
+' 子弹创建关系
+BulletStrategy ..> BaseBullet : creates
+
+' 具体飞机类与上下文的交互
+HeroAircraft --> BulletContext
+EliteEnemy --> BulletContext
+ElitePlusEnemy --> BulletContext
+BossEnemy --> BulletContext
+
+' 标记各种飞机默认使用的策略
+note bottom of HeroAircraft
+  默认使用DirectShootStrategy
+  获得prop_bullet时使用ScatterShootStrategy
+  获得prop_bulletPlus时使用RingShootStrategy
+end note
+
+note bottom of EliteEnemy
+  默认使用DirectShootStrategy
+end note
+
+note bottom of ElitePlusEnemy
+  默认使用ScatterShootStrategy
+end note
+
+note bottom of BossEnemy
+  默认使用RingShootStrategy
+end note
+
+@enduml

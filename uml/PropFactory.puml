@@ -1,0 +1,109 @@
+@startuml 飞机大战道具工厂模式
+
+'https://plantuml.com/class-diagram
+
+package 飞机大战游戏 {
+    ' 产品接口 - 道具
+    interface Prop {
+        + forward(): void
+        + takeEffect(HeroAircraft): void
+        + getLocationX(): int
+        + getLocationY(): int
+    }
+    
+    ' 具体产品 - 火力道具
+    class FireProp implements Prop {
+        + takeEffect(HeroAircraft): void
+        + forward(): void
+    }
+    
+    ' 具体产品 - 炸弹道具
+    class BombProp implements Prop {
+        + takeEffect(HeroAircraft): void
+        + forward(): void
+    }
+    
+    ' 具体产品 - 加血道具
+    class BloodProp implements Prop {
+        + takeEffect(HeroAircraft): void
+        + forward(): void
+    }
+    
+    ' 创建者接口 - 道具工厂
+    interface PropFactory {
+        + createProp(int, int): Prop
+    }
+    
+    ' 具体创建者 - 火力道具工厂
+    class FirePropFactory implements PropFactory {
+        + createProp(int, int): Prop
+    }
+    
+    ' 具体创建者 - 炸弹道具工厂
+    class BombPropFactory implements PropFactory {
+        + createProp(int, int): Prop
+    }
+    
+    ' 具体创建者 - 加血道具工厂
+    class BloodPropFactory implements PropFactory {
+        + createProp(int, int): Prop
+    }
+    
+    ' 客户端类
+    class Game {
+        - heroAircraft: HeroAircraft
+        - props: List<AbstractProp>
+        + dropProp(int, int): void
+    }
+    
+    ' 英雄机（单例）
+    class HeroAircraft {
+        - instance: HeroAircraft
+        + {static} getInstance(): HeroAircraft
+        + getHp(): int
+        + setHp(int): void
+        + decreaseHp(int): void
+        + isDestroyed(): boolean
+    }
+    
+    ' 关系
+    FirePropFactory --> FireProp: 创建
+    BombPropFactory --> BombProp: 创建
+    BloodPropFactory --> BloodProp: 创建
+    
+    Game --> PropFactory: 使用
+    Game --> HeroAircraft: 使用
+    
+    ' 工厂方法实现说明
+    note right of FirePropFactory
+        @Override
+        public Prop createProp(int x, int y) {
+            return new FireProp(x, y, 0, 15);
+        }
+    end note
+    
+    note right of BombPropFactory
+        @Override
+        public Prop createProp(int x, int y) {
+            return new BombProp(x, y, 0, 15);
+        }
+    end note
+    
+    note right of BloodPropFactory
+        @Override
+        public Prop createProp(int x, int y) {
+            return new BloodProp(x, y, 0, 15);
+        }
+    end note
+    
+    note bottom
+        道具工厂模式说明：
+        1. Prop接口定义了所有道具的共同行为
+        2. FireProp、BombProp和BloodProp实现具体道具逻辑
+        3. PropFactory接口定义了创建道具的抽象方法
+        4. 三个具体工厂实现创建对应道具的方法
+        5. Game类通过工厂接口创建道具，实现解耦
+    end note
+}
+
+@enduml

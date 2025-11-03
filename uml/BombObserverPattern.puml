@@ -1,0 +1,112 @@
+@startuml 炸弹道具观察者模式
+
+' 定义主题接口
+interface BombNotifier {
+    + registerObserver(observer: BombObserver): void
+    + removeObserver(observer: BombObserver): void
+    + notifyObservers(): void
+}
+
+' 定义观察者接口
+interface BombObserver {
+    + onBombExplode(): void
+}
+
+' 具体主题：炸弹道具
+class BombProp implements BombNotifier {
+    - observers: List<BombObserver>
+    + BombProp(locationX: int, locationY: int, speedX: int, speedY: int)
+    + active(): void
+    + registerObserver(observer: BombObserver): void
+    + removeObserver(observer: BombObserver): void
+    + notifyObservers(): void
+}
+
+' 具体观察者：普通敌机
+class MobAircraft implements BombObserver {
+    + onBombExplode(): void
+}
+
+' 具体观察者：精英敌机
+class EliteAircraft implements BombObserver {
+    + onBombExplode(): void
+}
+
+' 具体观察者：超级精英敌机
+class ElitePlusAircraft implements BombObserver {
+    + onBombExplode(): void
+}
+
+' 具体观察者：Boss敌机
+class BossAircraft implements BombObserver {
+    + onBombExplode(): void
+}
+
+' 具体观察者：敌机子弹
+class EnemyBullet implements BombObserver {
+    + onBombExplode(): void
+}
+
+' 游戏类，作为客户端
+class Game {
+    - heroAircraft: HeroAircraft
+    - enemyAircrafts: List<AbstractAircraft>
+    - enemyBullets: List<BaseBullet>
+    - props: List<AbstractProp>
+    + getInstance(): Game
+    + addObserverToBombProp(): void
+}
+
+' 继承关系
+abstract class AbstractAircraft {
+    - hp: int
+    - maxHp: int
+    + vanish(): void
+    + decreaseHp(decrease: int): void
+}
+
+abstract class BaseBullet {
+    + vanish(): void
+}
+
+MobAircraft --> AbstractAircraft
+EliteAircraft --> AbstractAircraft
+ElitePlusAircraft --> AbstractAircraft
+BossAircraft --> AbstractAircraft
+EnemyBullet --> BaseBullet
+
+' 关联关系
+BombProp "1" --> "*" BombObserver : 通知
+Game "1" --> "*" BombProp : 创建和管理
+Game "1" --> "*" AbstractAircraft : 管理
+Game "1" --> "*" BaseBullet : 管理
+
+' 客户端调用流程
+Game ..> BombProp : 注册观察者
+BombProp ..> BombObserver : 发送爆炸通知
+
+note bottom of BombProp
+  激活时通知所有观察者
+end note
+
+note bottom of MobAircraft
+  炸弹爆炸时被销毁
+end note
+
+note bottom of EliteAircraft
+  炸弹爆炸时被销毁
+end note
+
+note bottom of ElitePlusAircraft
+  炸弹爆炸时血量减少
+end note
+
+note bottom of BossAircraft
+  炸弹爆炸时不受影响
+end note
+
+note bottom of EnemyBullet
+  炸弹爆炸时被销毁
+end note
+
+@enduml
